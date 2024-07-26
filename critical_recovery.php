@@ -1,7 +1,7 @@
 <?php
 /**
- * Plugin Name: Emergency Deactivate Plugins
- * Description: Automatically deactivates all plugins when a critical error occurs.
+ * Plugin Name: Auto Deactivator Plugin
+ * Description: Automatically deactivate conflicting plugins or themes during critical errors.
  * Version: 1.0
  * Author: Maruf Hossain
  */
@@ -13,7 +13,8 @@ if (!defined('ABSPATH')) {
 // Register a shutdown function to catch fatal errors
 register_shutdown_function('emergency_capture_fatal_errors');
 
-function emergency_capture_fatal_errors() {
+function emergency_capture_fatal_errors()
+{
     $error = error_get_last();
     if ($error && in_array($error['type'], [E_ERROR, E_CORE_ERROR, E_COMPILE_ERROR, E_PARSE])) {
         // Set a transient indicating a critical error occurred
@@ -23,7 +24,8 @@ function emergency_capture_fatal_errors() {
 
 add_action('admin_init', 'emergency_check_and_deactivate_plugins');
 
-function emergency_check_and_deactivate_plugins() {
+function emergency_check_and_deactivate_plugins()
+{
     if (get_transient('emergency_plugin_deactivate')) {
         // Clear the transient
         delete_transient('emergency_plugin_deactivate');
@@ -47,8 +49,8 @@ function emergency_check_and_deactivate_plugins() {
         wp_cache_flush();
 
         // Add an admin notice
-        add_action('admin_notices', function() {
-            echo '<div class="notice notice-warning is-dismissible"><p>All plugins except the Emergency Deactivate Plugins plugin have been deactivated due to a critical error. Please check the site and reactivate plugins as needed.</p></div>';
+        add_action('admin_notices', function () {
+            echo '<div class="notice notice-warning is-dismissible"><p>The Auto Deactivator Plugin is active. It will automatically deactivate conflicting plugins during critical errors. Please check the site and reactivate plugins as needed.</p></div>';
         });
 
         // Redirect to the admin dashboard
@@ -60,12 +62,13 @@ function emergency_check_and_deactivate_plugins() {
 // Add a notice to the admin area to inform users about the plugin
 add_action('admin_notices', 'emergency_admin_notice');
 
-function emergency_admin_notice() {
+function emergency_admin_notice()
+{
     if (!is_admin()) {
         return;
     }
     $user = wp_get_current_user();
     if (isset($user->roles) && in_array('administrator', $user->roles)) {
-        echo '<div class="notice notice-warning is-dismissible"><p>The Emergency Deactivate Plugin is active. It will deactivate all plugins if a critical error occurs. Please deactivate this plugin after resolving the issues.</p></div>';
+        echo '<div class="notice notice-warning is-dismissible"><p>The Auto Deactivator Plugin is active. It will automatically deactivate conflicting plugins during critical errors. Please deactivate this plugin after resolving the issues.</p></div>';
     }
 }
